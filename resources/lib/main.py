@@ -121,6 +121,6 @@ class PlayVideo(listitem.PlayMedia):
 		
 		# Search sourceCode
 		test = re.findall("<param name=\"flashvars\" value='(.+?)'>", sourceCode)[0]
-		values = plugin.get_params(test)
+		values = plugin.parse_qs(test)
 		if values["type"] == "rtmp": return {"url":"%s/mp4:%s" % (values["streamer"], values["file"])}
 		else: return {"url":values["file"]}
