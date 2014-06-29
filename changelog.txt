@@ -1,5 +1,6 @@
 [B]Version 1.0.2[/B]
 - Update Strings to string.po
+- Added opton to hide sub categorys via context menu (Default to Hide)
 - Added Unittests
 - Code cleanup
 

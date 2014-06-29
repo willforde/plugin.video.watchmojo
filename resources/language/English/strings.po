@@ -2,6 +2,8 @@
 # Addon Name: Watchmojo
 # Addon id: plugin.video.watchmojo
 # Addon Provider: willforde
+msgid ""
+msgstr ""
 "Project-Id-Version: XBMC Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2014-06-26 21:10+0000\n"
