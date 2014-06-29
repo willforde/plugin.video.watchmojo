@@ -20,205 +20,171 @@
 import HTMLParser
 from xbmcutil import listitem, plugin
 
-class CategorysParser(HTMLParser.HTMLParser):
-	"""
-	Parses channel categorys, i.e http://www.watchmojo.com/
-	"""
-	def parse(self, html):
-		""" Parses SourceCode and Scrape Categorys """
-		
-		# Class Vars
-		self.section = 0
-		
-		# Proceed with parsing
-		self.reset_lists()
-		self.results = []
-		try: self.feed(html)
-		except plugin.ParserError: pass
-		
-		# Return Results
-		return self.results
-	
-	def reset_lists(self):
-		# Reset List for Next Run
-		self.item = listitem.ListItem()
-		self.item.urlParams["action"] = "SubCat"
-		self.idList = []
-	
-	def handle_starttag(self, tag, attrs):
-		# Convert Attributes to a Dictionary
-		if attrs: attrs = dict(attrs)
-		else: return
-		section = self.section
-		
-		# Find Each Category Bock
-		if section == 0:
-			if tag == u"li" and u"class" in attrs and attrs[u"class"] == u"off":
-				self.section = 1
-			elif tag == u"div" and u"id" in attrs and attrs[u"id"] == u"bar_main":
-				raise plugin.ParserError
-		
-		# Find Each Part within Section Block
-		elif section >= 1:
-			if section == 1 and tag == u"a" and u"href" in attrs:
-				url = attrs[u"href"]
-				self.item.urlParams["url"] = url
-				self.section = 101 # Title
-				url = url[:-2]
-				image = url[url.rfind(u"/")+1:].replace(u" ",u"-") + u".png"
-				self.item.setThumbnailImage(image, 1)
-			elif section == 2 and tag == u"a" and u"href" in attrs:
-				url = attrs[u"href"]
-				self.idList.append(url[url.find(u"/", 8)+1:][:-2])
-	
-	def handle_data(self, data):
-		# Fetch Category Title when within Section 2
-		if self.section == 101: # Title
-			self.item.setLabel(data)
-			self.section = 2
-	
-	def handle_endtag(self, tag):
-		# Search for each end tag
-		if self.section >= 1 and tag == u"ul":
-			self.section = 0
-			self.item.urlParams["idlist"] = u",".join(self.idList)
-			self.results.append(self.item.getListitemTuple())
-			self.reset_lists()
-
-class ThemesParser(HTMLParser.HTMLParser):
-	"""
-	Parses channel categorys, i.e http://www.watchmojo.com/video/theme/
-	"""
-	def parse(self, html):
-		""" Parses SourceCode and Scrape Categorys """
-
-		# Class Vars
-		self.section = 0
-		
-		# Proceed with parsing
-		self.reset_lists()
-		self.results = []
-		try: self.feed(html)
-		except plugin.ParserError: pass
-		
-		# Return Results
-		return self.results
-	
-	def reset_lists(self):
-		# Reset List for Next Run
-		self.item = listitem.ListItem()
-		self.item.urlParams["action"] = "Videos"
-		self.title = None
-	
-	def handle_starttag(self, tag, attrs):
-		# Convert Attributes to a Dictionary
-		if attrs: attrs = dict(attrs)
-		section = self.section
-		
-		# Find Each Category Bock
-		if section == 0 and tag == u"div":
-			if u"class" in attrs and attrs[u"class"] == u"theme_box":
-				self.section = 1
-			elif u"id" in attrs and attrs[u"id"] == u"grid_small":
-				raise plugin.ParserError
-		
-		# Find Each Part within Section Block
-		elif section >= 1:
-			if tag == u"img" and u"src" in attrs:
-				self.item.setThumbnailImage(attrs[u"src"])
-			elif tag == u"a" and u"class" in attrs and attrs[u"class"] == u"theme":
-				self.item.urlParams["url"] = attrs[u"href"]
-				self.section = 101 # Title
-			elif tag == u"span":
-				self.section = 102 # Title with Video Count
-	
-	def handle_data(self, data):
-		# Fetch HTML Tag Data
-		if self.section == 101: # Title
-			self.title = data
-			self.section = 1
-		elif self.section == 102: # Title with Video Count
-			self.item.setLabel(u"%s (%s)" % (self.title, data[:data.find(u" ")]))
-			self.results.append(self.item.getListitemTuple())
-			self.reset_lists()
-			self.section = 0
-
 class VideosParser(HTMLParser.HTMLParser):
 	"""
-	Parses channel categorys, i.e http://www.watchmojo.com/video/id/11529/
+	Parses channel categorys, i.e http://www.sciencefriday.com/topics/space.html#page/bytopic/1
 	"""
-	def parse(self, html):
+	def parse(self, html, contentType):
 		""" Parses SourceCode and Scrape Categorys """
 
 		# Class Vars
+		self.contentVideo = "video" in contentType
+		self.contentType = contentType
+		self.divcount = None
 		self.section = 0
 		
 		# Proceed with parsing
+		results = []
 		self.reset_lists()
-		self.results = []
-		try: self.feed(html.replace(u'_blank"',u''))
+		self.append = results.append
+		try: self.feed(html)
 		except plugin.ParserError: pass
 		
 		# Return Results
-		return self.results
+		return results
 	
 	def reset_lists(self):
 		# Reset List for Next Run
 		self.item = listitem.ListItem()
-		self.item.urlParams["action"] = "PlayVideo"
-		self.item.setQualityIcon(False)
+		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
+		else: self.item.urlParams["action"] = "PlayAudio"
+		self.item.setQualityIcon(True)
 		self.item.setAudioInfo()
 	
 	def handle_starttag(self, tag, attrs):
 		# Convert Attributes to a Dictionary
-		if attrs: attrs = dict(attrs)
-		section = self.section
-		
-		# Find Each Category Bock
-		if section == 0:
-			if tag == u"a" and u"href" in attrs and u"class" in attrs and attrs[u"class"] == u"grid_image":
-				self.item.urlParams["url"] = attrs[u"href"]
-				self.section = 1
-			elif tag == u"div" and u"id" in attrs and attrs[u"id"] == u"next":
-				self.section = -1
-		
-		# Find Each Part within Section Block
-		elif section >= 1:
-			if tag == u"img" and u"src" in attrs:
-				self.item.setThumbnailImage(attrs[u"src"])
-			elif tag == u"span" and u"class" in attrs and attrs[u"class"] == u"adate":
-				self.section = 101 # Date
-			elif tag == u"a" and u"class" in attrs and attrs[u"class"] == u"title":
-				self.section = 102 # Title
-			elif tag == u"br":
-				self.section = 103 # Plot
-		
-		# Find Next Page
-		elif section == -1:
-			if tag == u"a" and u"href" in attrs and attrs[u"href"].startswith(u"/video/"):
-				self.results.append(self.item.add_next_page(url={"url":attrs[u"href"]}))
-				raise plugin.ParserError
+		if self.divcount == 0: raise plugin.ParserError
+		elif tag == u"div":
+			# Increment div counter when within show-block
+			if self.divcount: self.divcount +=1
 			else:
-				raise plugin.ParserError
+				# Convert Attributes to a Dictionary
+				attrs = dict(attrs)
+				
+				# Check for required section
+				if u"id" in attrs and attrs[u"id"] == self.contentType: self.divcount = 1
+			
+		# Fetch video info Block
+		elif self.divcount == 3:
+			# Check for Title, Plot and Date
+			if tag == "h4": self.section = 101
+			elif tag == "a":
+				# Convert Attributes to a Dictionary
+				attrs = dict(attrs)
+				# Check for url and title
+				if self.section == 102 and u"href" in attrs:
+					self.item.urlParams["url"] = attrs[u"href"]
+					self.section = 103
+		
+		# Fetch Image Block
+		elif self.divcount == 5 and tag == "img":
+			# Convert Attributes to a Dictionary
+			attrs = dict(attrs)
+			# Fetch video Image
+			if "data-lazysrc" in attrs:
+				self.item.setThumbnailImage(attrs["data-lazysrc"])
 	
 	def handle_data(self, data):
-		# Fetch Category Title when within Section 2 or 3
-		section = self.section
-		if section == 101: # Date
-			self.item.setDateInfo(data, "%B %d, %Y")
-			self.section = 1
-		elif section == 102: # Title
+		# When within selected section fetch Time
+		if self.section == 101: # Date
+			self.item.setDateInfo(data, "%b. %d, %Y")
+			self.section = 102
+		elif self.section == 103: # Title
 			self.item.setLabel(data)
-			self.section == 1
-		elif section == 103: # Plot
-			if data.startswith(u"hosted by"): self.section = 1
-			else: 
-				self.item.infoLabels["plot"] = data.strip()
-				self.section = 1
+			self.section = 0
 	
 	def handle_endtag(self, tag):
-		# Search for each end tag
-		if self.section >= 1 and tag == u"div":
+		# Decrease div counter on all closing div elements
+		if tag == u"div" and self.divcount:
+			self.divcount -= 1
+			
+			# When at closeing tag for show-block, save fetched data
+			if self.divcount == 1:
+				self.append(self.item.getListitemTuple(True))
+				self.reset_lists()
+
+class RecentParser(HTMLParser.HTMLParser):
+	"""
+	Parses channel categorys, i.e http://www.sciencefriday.com/video/index.html#page/full-width-list/1
+	"""
+	def parse(self, html):
+		""" Parses SourceCode and Scrape Categorys """
+
+		# Class Vars
+		self.divcount = None
+		self.section = 0
+		self.contentVideo = plugin["type"] == "video"
+		
+		# Proceed with parsing
+		results = []
+		self.reset_lists()
+		self.append = results.append
+		try: self.feed(html)
+		except plugin.ParserError: pass
+		
+		# Return Results
+		return results
+	
+	def reset_lists(self):
+		# Reset List for Next Run
+		self.item = listitem.ListItem()
+		if self.contentVideo: self.item.urlParams["action"] = "PlayVideo"
+		else: self.item.urlParams["action"] = "PlayAudio"
+		self.item.setQualityIcon(True)
+		self.item.setAudioInfo()
+	
+	def handle_starttag(self, tag, attrs):
+		# Convert Attributes to a Dictionary
+		if self.divcount == 0: raise plugin.ParserError
+		elif tag == u"div":
+			# Increment div counter when within show-block
+			if self.divcount: self.divcount +=1
+			else:
+				# Convert Attributes to a Dictionary
+				attrs = dict(attrs)
+				
+				# Check for required section
+				if u"id" in attrs and attrs[u"id"] == u"full-width-list": self.divcount = 1
+			
+		# Fetch video info Block
+		elif self.divcount == 4:
+			# Check for Title, Plot and Date
+			if tag == "h4": self.section = 101
+			elif tag == "p": self.section = 102
+			elif tag == "a":
+				# Convert Attributes to a Dictionary
+				attrs = dict(attrs)
+				# Check for url and title
+				if u"href" in attrs:
+					self.item.urlParams["url"] = attrs[u"href"]
+					self.section = 103
+		
+		# Fetch Image Block
+		elif self.divcount == 5 and tag == "img":
+			# Convert Attributes to a Dictionary
+			attrs = dict(attrs)
+			# Fetch video Image
+			if "data-lazysrc" in attrs:
+				self.item.setThumbnailImage(attrs["data-lazysrc"])
+	
+	def handle_data(self, data):
+		# When within selected section fetch Time
+		if self.section == 101: # Date
+			self.item.setDateInfo(data, "%b. %d, %Y")
 			self.section = 0
-			self.results.append(self.item.getListitemTuple(True))
-			self.reset_lists()
+		elif self.section == 102: # Plot
+			self.item.infoLabels["plot"] = data.strip()
+			self.section = 0
+		elif self.section == 103: # Title
+			self.item.setLabel(data)
+			self.section = 0
+	
+	def handle_endtag(self, tag):
+		# Decrease div counter on all closing div elements
+		if tag == u"div" and self.divcount:
+			self.divcount -= 1
+			
+			# When at closeing tag for show-block, save fetched data
+			if self.divcount == 1:
+				self.append(self.item.getListitemTuple(True))
+				self.reset_lists()
