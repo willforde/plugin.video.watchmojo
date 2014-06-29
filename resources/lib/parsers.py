@@ -31,6 +31,7 @@ class CategorysParser(HTMLParser.HTMLParser):
 		self.section = 0
 		
 		# Proceed with parsing
+		self.extracat = plugin.getSettingBool("extracat")
 		self.reset_lists()
 		self.results = []
 		try: self.feed(html)
@@ -42,7 +43,9 @@ class CategorysParser(HTMLParser.HTMLParser):
 	def reset_lists(self):
 		# Reset List for Next Run
 		self.item = listitem.ListItem()
-		self.item.urlParams["action"] = "SubCat"
+		print self.extracat
+		if self.extracat: self.item.urlParams["action"] = "SubCat"
+		else: self.item.urlParams["action"] = "Videos"
 		self.idList = []
 	
 	def handle_starttag(self, tag, attrs):
@@ -74,7 +77,9 @@ class CategorysParser(HTMLParser.HTMLParser):
 	def handle_data(self, data):
 		# Fetch Category Title when within Section 2
 		if self.section == 101: # Title
-			self.item.setLabel(data)
+			title = data.strip()
+			self.item.setLabel(title)
+			self.item.urlParams["title"] = title
 			self.section = 2
 	
 	def handle_endtag(self, tag):

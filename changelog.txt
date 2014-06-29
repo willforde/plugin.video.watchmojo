@@ -1,3 +1,8 @@
+[B]Version 1.0.2[/B]
+- Update Strings to string.po
+- Added Unittests
+- Code cleanup
+
 [B]Version 1.0.1[/B]
 - Added full unicode support
 
