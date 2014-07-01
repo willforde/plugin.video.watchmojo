@@ -120,7 +120,7 @@ class PlayVideo(listitem.PlayMedia):
 	def resolve(self):
 		# Create url for oembed api
 		url = BASEURL + plugin["url"]
-		sourceCode = urlhandler.urlread(url, 14400)# TTL = 4 Hours
+		sourceCode = urlhandler.urlread(url, 14400, stripEntity=False)# TTL = 4 Hours
 		import re
 		
 		# Search sourceCode
