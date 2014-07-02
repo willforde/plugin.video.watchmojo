@@ -24,7 +24,10 @@ class CategorysParser(HTMLParser.HTMLParser):
 	"""
 	Parses channel categorys, i.e http://www.watchmojo.com/
 	"""
-	def parse(self, html):
+	def parse(self, urlobject, encoding="utf8"):
+		return self.fromstring(urlobject.read(), encoding)
+	
+	def fromstring(self, html, encoding="utf8"):
 		""" Parses SourceCode and Scrape Categorys """
 		
 		# Class Vars
@@ -34,7 +37,9 @@ class CategorysParser(HTMLParser.HTMLParser):
 		self.extracat = plugin.getSettingBool("extracat")
 		self.reset_lists()
 		self.results = []
-		try: self.feed(html)
+		try:
+			if encoding: self.feed(html.decode(encoding))
+			else: self.feed(html)
 		except plugin.ParserError: pass
 		
 		# Return Results
@@ -94,16 +99,21 @@ class ThemesParser(HTMLParser.HTMLParser):
 	"""
 	Parses channel categorys, i.e http://www.watchmojo.com/video/theme/
 	"""
-	def parse(self, html):
+	def parse(self, urlobject, encoding="utf8"):
+		return self.fromstring(urlobject.read(), encoding)
+	
+	def fromstring(self, html, encoding="utf8"):
 		""" Parses SourceCode and Scrape Categorys """
-
+		
 		# Class Vars
 		self.section = 0
 		
 		# Proceed with parsing
 		self.reset_lists()
 		self.results = []
-		try: self.feed(html)
+		try:
+			if encoding: self.feed(html.decode(encoding))
+			else: self.feed(html)
 		except plugin.ParserError: pass
 		
 		# Return Results
@@ -152,16 +162,21 @@ class VideosParser(HTMLParser.HTMLParser):
 	"""
 	Parses channel categorys, i.e http://www.watchmojo.com/video/id/11529/
 	"""
-	def parse(self, html):
+	def parse(self, urlobject, encoding="utf8"):
+		return self.fromstring(urlobject.read(), encoding)
+	
+	def fromstring(self, html, encoding="utf8"):
 		""" Parses SourceCode and Scrape Categorys """
-
+		
 		# Class Vars
 		self.section = 0
 		
 		# Proceed with parsing
 		self.reset_lists()
 		self.results = []
-		try: self.feed(html.replace(u'_blank"',u''))
+		try:
+			if encoding: self.feed(html.decode(encoding).replace(u'_blank"',u''))
+			else: self.feed(html.replace(u'_blank"',u''))
 		except plugin.ParserError: pass
 		
 		# Return Results

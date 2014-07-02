@@ -26,8 +26,9 @@ class Initialize(listitem.VirtualFS):
 	def scraper(self):
 		# Fetch Video Content
 		url = u"%s/video/theme/" % BASEURL
-		sourceCode = urlhandler.urlread(url, 604800) # TTL = 1 Week
-		videoItems = parsers.CategorysParser().parse(sourceCode)
+		sourceObj = urlhandler.urlopen(url, 604800) # TTL = 1 Week
+		videoItems = parsers.CategorysParser().parse(sourceObj)
+		sourceObj.close()
 		
 		# Add Extra Items
 		icon = (plugin.getIcon(),0)
@@ -47,8 +48,9 @@ class Themes(listitem.VirtualFS):
 	def scraper(self):
 		# Fetch Video Content
 		url = BASEURL + plugin["url"]
-		sourceCode = urlhandler.urlread(url, 604800) # TTL = 1 Week
-		videoItems = parsers.ThemesParser().parse(sourceCode)
+		sourceObj = urlhandler.urlopen(url, 604800) # TTL = 1 Week
+		videoItems = parsers.ThemesParser().parse(sourceObj)
+		sourceObj.close()
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_video_title)
@@ -105,8 +107,9 @@ class Videos(listitem.VirtualFS):
 	def scraper(self):
 		# Fetch Video Content
 		url = BASEURL + plugin["url"].replace(u" ",u"%20")
-		sourceCode = urlhandler.urlread(url, 14400) # TTL = 4 Hours
-		videoItems = parsers.VideosParser().parse(sourceCode)
+		sourceObj = urlhandler.urlopen(url, 14400) # TTL = 4 Hours
+		videoItems = parsers.VideosParser().parse(sourceObj)
+		sourceObj.close()
 		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
