@@ -74,7 +74,7 @@ class CategorysParser(HTMLParser.HTMLParser):
 				self.section = 101 # Title
 				url = url[:-2]
 				image = url[url.rfind(u"/")+1:].replace(u" ",u"-") + u".png"
-				self.item.setThumbnailImage(image, 1)
+				self.item.setThumb(image, 1)
 			elif section == 2 and tag == u"a" and u"href" in attrs:
 				url = attrs[u"href"]
 				self.idList.append(url[url.find(u"/", 8)+1:][:-2])
@@ -140,7 +140,7 @@ class ThemesParser(HTMLParser.HTMLParser):
 		# Find Each Part within Section Block
 		elif section >= 1:
 			if tag == u"img" and u"src" in attrs:
-				self.item.setThumbnailImage(attrs[u"src"])
+				self.item.setThumb(attrs[u"src"])
 			elif tag == u"a" and u"class" in attrs and attrs[u"class"] == u"theme":
 				self.item.urlParams["url"] = attrs[u"href"]
 				self.section = 101 # Title
@@ -187,7 +187,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		self.item = listitem.ListItem()
 		self.item.urlParams["action"] = "PlayVideo"
 		self.item.setQualityIcon(False)
-		self.item.setAudioInfo()
+		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
 		# Convert Attributes to a Dictionary
@@ -205,7 +205,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		# Find Each Part within Section Block
 		elif section >= 1:
 			if tag == u"img" and u"src" in attrs:
-				self.item.setThumbnailImage(attrs[u"src"])
+				self.item.setThumb(attrs[u"src"])
 			elif tag == u"span" and u"class" in attrs and attrs[u"class"] == u"adate":
 				self.section = 101 # Date
 			elif tag == u"a" and u"class" in attrs and attrs[u"class"] == u"title":
@@ -225,7 +225,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		# Fetch Category Title when within Section 2 or 3
 		section = self.section
 		if section == 101: # Date
-			self.item.setDateInfo(data, "%B %d, %Y")
+			self.item.setDate(data, "%B %d, %Y")
 			self.section = 1
 		elif section == 102: # Title
 			self.item.setLabel(data)
