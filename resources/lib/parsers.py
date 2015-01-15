@@ -186,6 +186,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		# Reset List for Next Run
 		self.item = listitem.ListItem()
 		self.item.urlParams["action"] = "PlayVideo"
+		self.item.setQualityIcon(False)
 		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
@@ -239,5 +240,5 @@ class VideosParser(HTMLParser.HTMLParser):
 		# Search for each end tag
 		if self.section >= 1 and tag == u"div":
 			self.section = 0
-			self.results.append(self.item.getListitemTuple(True, False))
+			self.results.append(self.item.getListitemTuple(True))
 			self.reset_lists()
