@@ -216,7 +216,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		# Find Next Page
 		elif section == -1:
 			if tag == u"a" and u"href" in attrs and attrs[u"href"].startswith(u"/video/"):
-				self.results.append(self.item.add_next_page(url={"url":attrs[u"href"]}))
+				self.item.add_next_page(url={"url":attrs[u"href"]})
 				raise plugin.ParserError
 			else:
 				raise plugin.ParserError
