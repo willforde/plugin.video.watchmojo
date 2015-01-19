@@ -72,8 +72,6 @@ class SubCat(listitem.VirtualFS):
 	
 	def regex_scraper(self, sourceCode):
 		# Create Speed vars
-		results = []
-		additem = results.append
 		localListitem = listitem.ListItem
 		mainTitle = plugin["title"]
 		import re
@@ -94,10 +92,7 @@ class SubCat(listitem.VirtualFS):
 			item.setParamDict(action="Videos", url=url)
 			
 			# Store Listitem data
-			additem(item.getListitemTuple(False))
-			
-		# Return list of listitems
-		return results
+			yield item.getListitemTuple(False)
 
 class Videos(listitem.VirtualFS):
 	@plugin.error_handler
