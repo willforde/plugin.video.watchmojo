@@ -1,3 +1,9 @@
+[B]Version 1.0.3[/B] 2015-01-19
+- Removed set_content call
+- Change to return a generator instead of a list
+- Removed results.append from Next_Page (Not needed anymore)
+- Some small method renames
+
 [B]Version 1.0.2[/B] 2014-06-30
 - Update Strings to strings.po
 - Added UnitTests
