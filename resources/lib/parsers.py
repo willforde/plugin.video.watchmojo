@@ -186,7 +186,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		# Reset List for Next Run
 		self.item = listitem.ListItem()
 		self.item.urlParams["action"] = "PlayVideo"
-		self.item.setQualityIcon(False)
+		self.item.setVideoFlags(False)
 		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
