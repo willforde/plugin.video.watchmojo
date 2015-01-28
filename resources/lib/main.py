@@ -24,12 +24,6 @@ BASEURL = u"http://www.watchmojo.com"
 class Initialize(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
-		# Fetch Video Content
-		url = u"%s/video/theme/" % BASEURL
-		sourceObj = urlhandler.urlopen(url, 604800) # TTL = 1 Week
-		videoItems = parsers.CategorysParser().parse(sourceObj)
-		sourceObj.close()
-		
 		# Add Extra Items
 		icon = (plugin.getIcon(),0)
 		self.add_youtube_channel("watchmojo", hasHD=False)
@@ -39,23 +33,21 @@ class Initialize(listitem.VirtualFS):
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_video_title)
 		
-		# Return List of Video Listitems
-		return videoItems
+		# Fetch Video Content
+		url = u"%s/video/theme/" % BASEURL
+		with urlhandler.urlopen(url, 604800) as sourceObj: # TTL = 1 Week
+			return parsers.CategorysParser().parse(sourceObj)
 
 class Themes(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
-		# Fetch Video Content
-		url = BASEURL + plugin["url"]
-		sourceObj = urlhandler.urlopen(url, 604800) # TTL = 1 Week
-		videoItems = parsers.ThemesParser().parse(sourceObj)
-		sourceObj.close()
-		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_video_title)
 		
-		# Return List of Video Listitems
-		return videoItems
+		# Fetch Video Content
+		url = BASEURL + plugin["url"]
+		with urlhandler.urlopen(url, 604800) as sourceObj: # TTL = 1 Week
+			return parsers.ThemesParser().parse(sourceObj)
 
 class SubCat(listitem.VirtualFS):
 	@plugin.error_handler
@@ -97,17 +89,13 @@ class SubCat(listitem.VirtualFS):
 class Videos(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
-		# Fetch Video Content
-		url = BASEURL + plugin["url"].replace(u" ",u"%20")
-		sourceObj = urlhandler.urlopen(url, 14400) # TTL = 4 Hours
-		videoItems = parsers.VideosParser().parse(sourceObj)
-		sourceObj.close()
-		
 		# Set Content Properties
 		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
 		
-		# Return List of Video Listitems
-		return videoItems
+		# Fetch Video Content
+		url = BASEURL + plugin["url"].replace(u" ",u"%20")
+		with urlhandler.urlopen(url, 14400) as sourceObj: # TTL = 4 Hours
+			return parsers.VideosParser().parse(sourceObj)
 
 class PlayVideo(listitem.PlayMedia):
 	@plugin.error_handler
