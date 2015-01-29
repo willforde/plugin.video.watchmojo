@@ -30,9 +30,6 @@ class Initialize(listitem.VirtualFS):
 		self.add_item(u"-%s" % plugin.getuni(32941), thumbnail=icon, url={"action":"Videos", "url":"/video/cat/home/1"})
 		self.add_item(u"-%s" % plugin.getuni(30101), thumbnail=icon, url={"action":"Themes", "url":"/video/theme/"})
 		
-		# Set Content Properties
-		self.set_sort_methods(self.sort_method_video_title)
-		
 		# Fetch Video Content
 		url = u"%s/video/theme/" % BASEURL
 		with urlhandler.urlopen(url, 604800) as sourceObj: # TTL = 1 Week
@@ -41,9 +38,6 @@ class Initialize(listitem.VirtualFS):
 class Themes(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
-		# Set Content Properties
-		self.set_sort_methods(self.sort_method_video_title)
-		
 		# Fetch Video Content
 		url = BASEURL + plugin["url"]
 		with urlhandler.urlopen(url, 604800) as sourceObj: # TTL = 1 Week
@@ -55,9 +49,6 @@ class SubCat(listitem.VirtualFS):
 		# Fetch Video Content
 		url = u"%s/video/theme/" % BASEURL
 		sourceCode = urlhandler.urlread(url, 604800) # TTL = 1 Week
-		
-		# Set Content Properties
-		self.set_sort_methods(self.sort_method_video_title)
 		
 		# Fetch and Return VideoItems
 		return self.regex_scraper(sourceCode)
@@ -89,9 +80,6 @@ class SubCat(listitem.VirtualFS):
 class Videos(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
-		# Set Content Properties
-		self.set_sort_methods(self.sort_method_date, self.sort_method_video_title)
-		
 		# Fetch Video Content
 		url = BASEURL + plugin["url"].replace(u" ",u"%20")
 		with urlhandler.urlopen(url, 14400) as sourceObj: # TTL = 4 Hours
