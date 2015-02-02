@@ -25,10 +25,11 @@ class Initialize(listitem.VirtualFS):
 	@plugin.error_handler
 	def scraper(self):
 		# Add Extra Items
-		icon = (plugin.getIcon(),0)
+		_plugin = plugin
+		icon = (_plugin.getIcon(),0)
 		self.add_youtube_channel("watchmojo", hasHD=False)
-		self.add_item(u"-%s" % plugin.getuni(32941), thumbnail=icon, url={"action":"Videos", "url":"/video/cat/home/1"})
-		self.add_item(u"-%s" % plugin.getuni(30101), thumbnail=icon, url={"action":"Themes", "url":"/video/theme/"})
+		self.add_item(u"-%s" % _plugin.getuni(32941), thumbnail=icon, url={"action":"Videos", "url":"/video/cat/home/1"})
+		self.add_item(u"-%s" % _plugin.getuni(30101), thumbnail=icon, url={"action":"Themes", "url":"/video/theme/"})
 		
 		# Fetch Video Content
 		url = u"%s/video/theme/" % BASEURL
@@ -55,15 +56,16 @@ class SubCat(listitem.VirtualFS):
 	
 	def regex_scraper(self, sourceCode):
 		# Create Speed vars
+		_plugin = plugin
 		localListitem = listitem.ListItem
-		mainTitle = plugin["title"]
+		mainTitle = _plugin["title"]
 		import re
 		
 		# Add Current Category
-		self.add_item(label=u"-%s" % mainTitle, url={"action":"Videos", "url":plugin["url"]})
+		self.add_item(label=u"-%s" % mainTitle, url={"action":"Videos", "url":_plugin["url"]})
 		mainTitle = mainTitle.lower()
 		
-		for catID in plugin["idlist"].split(u","):
+		for catID in _plugin["idlist"].split(u","):
 			# Fetch Title and Set url & action
 			url = u"/video/id/%s/1" % catID
 			title = re.findall('<a href="%s">(.+?)</a>' % url, sourceCode)[0]
@@ -89,12 +91,13 @@ class PlayVideo(listitem.PlayMedia):
 	@plugin.error_handler
 	def resolve(self):
 		# Create url for oembed api
-		url = BASEURL + plugin["url"]
+		_plugin = plugin
+		url = BASEURL + _plugin["url"]
 		sourceCode = urlhandler.urlread(url, 14400, stripEntity=False)# TTL = 4 Hours
 		import re
 		
 		# Search sourceCode
 		test = re.findall("<param name=\"flashvars\" value='(.+?)'>", sourceCode)[0]
-		values = plugin.parse_qs(test)
-		if values["type"] == "rtmp": return {"url":"%s/mp4:%s" % (values["streamer"], values["file"])}
-		else: return {"url":values["file"]}
+		values = _plugin.parse_qs(test)
+		if values["type"] == "rtmp": return "%s/mp4:%s" % (values["streamer"], values["file"])
+		else: return values["file"]
