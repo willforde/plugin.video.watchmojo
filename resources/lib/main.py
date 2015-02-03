@@ -28,7 +28,7 @@ class Initialize(listitem.VirtualFS):
 		_plugin = plugin
 		icon = (_plugin.getIcon(),0)
 		self.add_youtube_channel("watchmojo", hasHD=False)
-		self.add_item(u"-%s" % _plugin.getuni(33941), thumbnail=icon, url={"action":"Videos", "url":"/video/cat/home/1"})
+		self.add_item(u"-%s" % _plugin.getuni(32941), thumbnail=icon, url={"action":"Videos", "url":"/video/cat/home/1"})
 		self.add_item(u"-%s" % _plugin.getuni(30101), thumbnail=icon, url={"action":"Themes", "url":"/video/theme/"})
 		
 		# Fetch Video Content
