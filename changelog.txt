@@ -1,4 +1,4 @@
-[B]Version 1.0.3[/B] 2015-01-19
+[B]Version 2.0.0[/B] 2015-02-10
 - Removed set_content call
 - Removed unneeded set_sort_methods
 - Removed xbmcutil.cleanup try finally catch

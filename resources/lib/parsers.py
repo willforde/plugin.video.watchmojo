@@ -250,7 +250,7 @@ class VideosParser(HTMLParser.HTMLParser):
 			# Fetch Title
 			elif tag == u"a":
 				for key, value in attrs:
-					if key == u"class" and value == u"title"
+					if key == u"class" and value == u"title":
 						self.section = 102 # Title
 						break
 			
@@ -262,7 +262,7 @@ class VideosParser(HTMLParser.HTMLParser):
 		elif section == -1:
 			if tag == u"a":
 				for key, value in attrs:
-					if key == u"href" and value[:7] == u"/video/"
+					if key == u"href" and value[:7] == u"/video/":
 						self.item.add_next_page(url={"url":value})
 						raise plugin.ParserError
 			else:
