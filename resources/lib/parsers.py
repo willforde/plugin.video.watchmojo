@@ -34,7 +34,7 @@ class CategorysParser(HTMLParser.HTMLParser):
 		self.section = 0
 		
 		# Proceed with parsing
-		self.extracat = plugin.getSettingBool("extracat")
+		self.extracat = "SubCat" if plugin.getSettingBool("extracat") else "Videos"
 		self.reset_lists()
 		self.results = []
 		try:
@@ -48,36 +48,44 @@ class CategorysParser(HTMLParser.HTMLParser):
 	def reset_lists(self):
 		# Reset List for Next Run
 		self.item = listitem.ListItem()
-		print self.extracat
-		if self.extracat: self.item.urlParams["action"] = "SubCat"
-		else: self.item.urlParams["action"] = "Videos"
+		self.item.urlParams["action"] = self.extracat
 		self.idList = []
 	
 	def handle_starttag(self, tag, attrs):
 		# Convert Attributes to a Dictionary
-		if attrs: attrs = dict(attrs)
-		else: return
+		if not attrs: return
 		section = self.section
 		
 		# Find Each Category Bock
 		if section == 0:
-			if tag == u"li" and u"class" in attrs and attrs[u"class"] == u"off":
-				self.section = 1
-			elif tag == u"div" and u"id" in attrs and attrs[u"id"] == u"bar_main":
-				raise plugin.ParserError
+			if tag == u"li":
+				for key, value in attrs:
+					if key == u"class" and value == u"off":
+						self.section = 1
+						break
+				
+			elif tag == u"div":
+				for key, value in attrs:
+					if key == u"id" and value == u"bar_main":
+						raise plugin.ParserError
 		
 		# Find Each Part within Section Block
 		elif section >= 1:
-			if section == 1 and tag == u"a" and u"href" in attrs:
-				url = attrs[u"href"]
-				self.item.urlParams["url"] = url
-				self.section = 101 # Title
-				url = url[:-2]
-				image = url[url.rfind(u"/")+1:].replace(u" ",u"-") + u".png"
-				self.item.setThumb(image, 1)
-			elif section == 2 and tag == u"a" and u"href" in attrs:
-				url = attrs[u"href"]
-				self.idList.append(url[url.find(u"/", 8)+1:][:-2])
+			if section == 1 and tag == u"a":
+				for key, value in attrs:
+					if key == u"href":
+						self.item.urlParams["url"] = value
+						self.section = 101 # Title
+						url = value[:-2]
+						image = url[url.rfind(u"/")+1:].replace(u" ",u"-") + u".png"
+						self.item.setThumb(image, 1)
+						break
+			
+			elif section == 2 and tag == u"a":
+				for key, value in attrs:
+					if key == u"href":
+						self.idList.append(value[value.find(u"/", 8)+1:][:-2])
+						break
 	
 	def handle_data(self, data):
 		# Fetch Category Title when within Section 2
@@ -127,23 +135,35 @@ class ThemesParser(HTMLParser.HTMLParser):
 	
 	def handle_starttag(self, tag, attrs):
 		# Convert Attributes to a Dictionary
-		if attrs: attrs = dict(attrs)
 		section = self.section
 		
 		# Find Each Category Bock
 		if section == 0 and tag == u"div":
-			if u"class" in attrs and attrs[u"class"] == u"theme_box":
-				self.section = 1
-			elif u"id" in attrs and attrs[u"id"] == u"grid_small":
-				raise plugin.ParserError
+			for key, value in attrs:
+				if key == u"class" and value == u"theme_box":
+					self.section = 1
+					break
+				elif key == u"id" and value == u"grid_small":
+					raise plugin.ParserError
 		
 		# Find Each Part within Section Block
 		elif section >= 1:
-			if tag == u"img" and u"src" in attrs:
-				self.item.setThumb(attrs[u"src"])
-			elif tag == u"a" and u"class" in attrs and attrs[u"class"] == u"theme":
-				self.item.urlParams["url"] = attrs[u"href"]
-				self.section = 101 # Title
+			if tag == u"img":
+				for key, value in attrs:
+					if key == u"src":
+						self.item.setThumb(value)
+						break
+			
+			elif tag == u"a":
+				varhref = carclass = None
+				for key, value in attrs:
+					if key == u"href": varhref = value
+					elif key == u"class" and value == u"theme": carclass = True
+				
+				if varhref and carclass:
+					self.item.urlParams["url"] = varhref
+					self.section = 101 # Title
+			
 			elif tag == u"span":
 				self.section = 102 # Title with Video Count
 	
@@ -190,34 +210,61 @@ class VideosParser(HTMLParser.HTMLParser):
 		self.item.setAudioFlags()
 	
 	def handle_starttag(self, tag, attrs):
-		# Convert Attributes to a Dictionary
-		if attrs: attrs = dict(attrs)
+		# Quck ref
 		section = self.section
 		
 		# Find Each Category Bock
 		if section == 0:
-			if tag == u"a" and u"href" in attrs and u"class" in attrs and attrs[u"class"] == u"grid_image":
-				self.item.urlParams["url"] = attrs[u"href"]
-				self.section = 1
-			elif tag == u"div" and u"id" in attrs and attrs[u"id"] == u"next":
-				self.section = -1
+			if tag == u"a":
+				varhref = varclass = None
+				for key, value in attrs:
+					if key == u"href": varhref = value
+					elif key == u"class" and value == u"grid_image": varclass = True
+				
+				if varhref and varclass:
+					self.item.urlParams["url"] = varhref
+					self.section = 1
+				
+			elif tag == u"div":
+				for key, value in attrs:
+					if key == u"id" and value == u"next":
+						self.section = -1
+						break
 		
 		# Find Each Part within Section Block
 		elif section >= 1:
-			if tag == u"img" and u"src" in attrs:
-				self.item.setThumb(attrs[u"src"])
-			elif tag == u"span" and u"class" in attrs and attrs[u"class"] == u"adate":
-				self.section = 101 # Date
-			elif tag == u"a" and u"class" in attrs and attrs[u"class"] == u"title":
-				self.section = 102 # Title
+			# Fetch image url
+			if tag == u"img":
+				for key, value in attrs:
+					if key == u"src":
+						self.item.setThumb(value)
+						break
+			
+			# Fetch Date
+			elif tag == u"span":
+				for key, value in attrs:
+					if key == u"class" and value == u"adate":
+						self.section = 101 # Date
+						break
+			
+			# Fetch Title
+			elif tag == u"a":
+				for key, value in attrs:
+					if key == u"class" and value == u"title"
+						self.section = 102 # Title
+						break
+			
+			# Fetch Plot
 			elif tag == u"br":
 				self.section = 103 # Plot
 		
 		# Find Next Page
 		elif section == -1:
-			if tag == u"a" and u"href" in attrs and attrs[u"href"].startswith(u"/video/"):
-				self.item.add_next_page(url={"url":attrs[u"href"]})
-				raise plugin.ParserError
+			if tag == u"a":
+				for key, value in attrs:
+					if key == u"href" and value[:7] == u"/video/"
+						self.item.add_next_page(url={"url":value})
+						raise plugin.ParserError
 			else:
 				raise plugin.ParserError
 	
