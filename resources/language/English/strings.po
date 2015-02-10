@@ -1,4 +1,4 @@
-# XBMC Media Center language file
+# Kodi Media Center language file
 # Addon Name: Watchmojo
 # Addon id: plugin.video.watchmojo
 # Addon Provider: willforde
