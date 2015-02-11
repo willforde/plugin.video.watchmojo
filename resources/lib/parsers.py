@@ -20,6 +20,7 @@
 import HTMLParser
 from xbmcutil import listitem, plugin
 
+BaseURL = u"http://www.watchmojo.com%s"
 class CategorysParser(HTMLParser.HTMLParser):
 	"""
 	Parses channel categorys, i.e http://www.watchmojo.com/
@@ -151,7 +152,7 @@ class ThemesParser(HTMLParser.HTMLParser):
 			if tag == u"img":
 				for key, value in attrs:
 					if key == u"src":
-						self.item.setThumb(value)
+						self.item.setThumb(BaseURL % value)
 						break
 			
 			elif tag == u"a":
@@ -237,7 +238,8 @@ class VideosParser(HTMLParser.HTMLParser):
 			if tag == u"img":
 				for key, value in attrs:
 					if key == u"src":
-						self.item.setThumb(value)
+						print BaseURL % value
+						self.item.setThumb(BaseURL % value)
 						break
 			
 			# Fetch Date
