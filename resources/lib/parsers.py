@@ -238,7 +238,6 @@ class VideosParser(HTMLParser.HTMLParser):
 			if tag == u"img":
 				for key, value in attrs:
 					if key == u"src":
-						print BaseURL % value
 						self.item.setThumb(BaseURL % value)
 						break
 			
