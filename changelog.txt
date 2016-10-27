@@ -1,5 +1,5 @@
 [B]Version 2.0.1[/B]
-- Added option to disable url caching from the add-on settings.
+- Fix video url scraper after site changed to html5
 
 [B]Version 2.0.0[/B] 2015-02-20
 - Removed set_content call
