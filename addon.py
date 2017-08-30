@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from codequick import Route, Resolver, Listitem, run, utils
 
 # Localized string Constants
-ALLVIDEOS = 32003
 TAGS = 20459
 
 # Base url constructor
@@ -78,24 +77,12 @@ def video_list(plugin, url):
     """
     url = url_constructor(url)
     source = plugin.request.get(url)
+    lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
     root_elem = source.parse()
     for elem in root_elem.iterfind(".//div[@class='item']"):
-        item = Listitem()
-        item.label = elem.findtext(".//div[@class='hptitle']").replace("\t", " ").strip()
-        item.art["thumb"] = url_constructor(elem.find(".//img").get("src"))
-
-        duration = elem.find(".//img[@class='hpplay']").tail
-        if duration:
-            item.info["duration"] = duration.strip(";")
-
-        url = elem.find("a").get("href")
-        item.info.date(elem.findtext(".//div[@class='hpdate']").strip(), "%b %d, %Y")
-        item.context.container(plugin.localize(TAGS), tags, url=url)
-        item.context.related(related, url=url)
-        item.set_callback(play_video, url=url)
-        yield item
+        yield extract_videos(lbl_tags, elem, "%b %d, %Y")
 
     # Add link to next page if available
     next_page = root_elem.find(".//div[@class='cat-next']")
@@ -117,24 +104,29 @@ def related(plugin, url):
     """
     url = url_constructor(url)
     source = plugin.request.get(url)
+    lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
     root_elem = source.parse("div", attrs={"id": "owl-demo1"})
     for elem in root_elem.iterfind(".//div[@class='item']"):
-        item = Listitem()
-        item.label = elem.findtext(".//div[@class='hptitle']").replace("\t", " ").strip()
-        item.art["thumb"] = url_constructor(elem.find(".//img").get("src"))
+        yield extract_videos(lbl_tags, elem, "%B %d, %Y")
 
-        duration = elem.find(".//img[@class='hpplay']").tail
-        if duration:
-            item.info["duration"] = duration.strip(";")
 
-        url = elem.find("a").get("href")
-        item.info.date(elem.findtext(".//div[@class='hpdate']").strip(), "%B %d, %Y")
-        item.context.container(plugin.localize(TAGS), tags, url=url)
-        item.context.related(related, url=url)
-        item.set_callback(play_video, url=url)
-        yield item
+def extract_videos(lbl_tags, elem, date_format):
+    item = Listitem()
+    item.label = elem.findtext(".//div[@class='hptitle']").replace("\t", " ").strip()
+    item.art["thumb"] = url_constructor(elem.find(".//img").get("src"))
+
+    duration = elem.find(".//img[@class='hpplay']").tail
+    if duration:
+        item.info["duration"] = duration.strip(";")
+
+    url = elem.find("a").get("href")
+    item.info.date(elem.findtext(".//div[@class='hpdate']").strip(), date_format)
+    item.context.container(lbl_tags, tags, url=url)
+    item.context.related(related, url=url)
+    item.set_callback(play_video, url=url)
+    return item
 
 
 @Route.register
