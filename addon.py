@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2016 - 2017 William Forde (willforde+addon@gmail.com)
+# Copyright: (c) 2016 - 2017 William Forde (willforde+kodi@gmail.com)
 # License: GPLv2, see LICENSE for more details
 #
 # This program is free software; you can redistribute it and/or
@@ -46,11 +46,6 @@ def extract_videos(lbl_tags, elem, date_format):
     return item
 
 
-def request(url):
-    url = url_constructor(url)
-    return urlquick.get(url)
-
-
 # ###### Callbacks ###### #
 
 @Route.register
@@ -63,7 +58,9 @@ def root(_):
     :param Route _: Tools related to callback.
     :return: A generator of listitems.
     """
-    source = request("/")
+    url = url_constructor("/")
+    source = urlquick.get(url)
+
     # Item youtube link as a all videos option
     yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")
 
@@ -101,7 +98,8 @@ def video_list(plugin, url):
     :param unicode url: The url to a list of videos.
     :return: A generator of listitems.
     """
-    source = request(url)
+    url = url_constructor(url)
+    source = urlquick.get(url)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -127,7 +125,8 @@ def related(plugin, url):
     :param unicode url: The url to a video.
     :return: A generator of listitems.
     """
-    source = request(url)
+    url = url_constructor(url)
+    source = urlquick.get(url)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -147,7 +146,8 @@ def tags(_, url):
     :param unicode url: The url to a video.
     :return: A generator of listitems.
     """
-    source = request(url)
+    url = url_constructor(url)
+    source = urlquick.get(url)
 
     # Parse all video tags
     root_elem = source.parse("div", attrs={"id": "tags"})
