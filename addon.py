@@ -17,6 +17,7 @@
 
 from __future__ import unicode_literals
 from codequick import Route, Resolver, Listitem, run, utils
+import urlquick
 
 # Localized string Constants
 TAGS = 20459
@@ -25,19 +26,43 @@ TAGS = 20459
 url_constructor = utils.urljoin_partial("http://www.watchmojo.com")
 
 
+# ###### Functions ###### #
+
+def extract_videos(lbl_tags, elem, date_format):
+    item = Listitem()
+    item.label = elem.findtext(".//div[@class='hptitle']").replace("\t", " ").strip()
+    item.art["thumb"] = url_constructor(elem.find(".//img").get("src"))
+
+    duration = elem.find(".//img[@class='hpplay']").tail
+    if duration:
+        item.info["duration"] = duration.strip(";")
+
+    url = elem.find("a").get("href")
+    item.info.date(elem.findtext(".//div[@class='hpdate']").strip(), date_format)
+    item.context.container(lbl_tags, tags, url=url)
+    item.context.related(related, url=url)
+    item.set_callback(play_video, url=url)
+    return item
+
+
+def request(url):
+    url = url_constructor(url)
+    return urlquick.get(url)
+
+
+# ###### Callbacks ###### #
+
 @Route.register
-def root(plugin):
+def root(_):
     """
     Lists all categories and link's to 'Shows', 'MsMojo' and 'All videos'.
 
     site: http://www.watchmojo.com
 
-    :param Route plugin: Tools related to callback.
+    :param Route _: Tools related to callback.
     :return: A generator of listitems.
     """
-    url = url_constructor("/")
-    source = plugin.request.get(url)
-
+    source = request("/")
     # Item youtube link as a all videos option
     yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")
 
@@ -75,8 +100,7 @@ def video_list(plugin, url):
     :param unicode url: The url to a list of videos.
     :return: A generator of listitems.
     """
-    url = url_constructor(url)
-    source = plugin.request.get(url)
+    source = request(url)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -102,8 +126,7 @@ def related(plugin, url):
     :param unicode url: The url to a video.
     :return: A generator of listitems.
     """
-    url = url_constructor(url)
-    source = plugin.request.get(url)
+    source = request(url)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -112,36 +135,18 @@ def related(plugin, url):
         yield extract_videos(lbl_tags, elem, "%B %d, %Y")
 
 
-def extract_videos(lbl_tags, elem, date_format):
-    item = Listitem()
-    item.label = elem.findtext(".//div[@class='hptitle']").replace("\t", " ").strip()
-    item.art["thumb"] = url_constructor(elem.find(".//img").get("src"))
-
-    duration = elem.find(".//img[@class='hpplay']").tail
-    if duration:
-        item.info["duration"] = duration.strip(";")
-
-    url = elem.find("a").get("href")
-    item.info.date(elem.findtext(".//div[@class='hpdate']").strip(), date_format)
-    item.context.container(lbl_tags, tags, url=url)
-    item.context.related(related, url=url)
-    item.set_callback(play_video, url=url)
-    return item
-
-
 @Route.register
-def tags(plugin, url):
+def tags(_, url):
     """
     List tags for a video.
 
     site: http://www.watchmojo.com/video/id/19268/
 
-    :param Route plugin: Tools related to Route callbacks.
+    :param Route _: Tools related to Route callbacks.
     :param unicode url: The url to a video.
     :return: A generator of listitems.
     """
-    url = url_constructor(url)
-    source = plugin.request.get(url)
+    source = request(url)
 
     # Parse all video tags
     root_elem = source.parse("div", attrs={"id": "tags"})
