@@ -18,7 +18,6 @@
 
 from __future__ import unicode_literals
 from codequick import Route, Resolver, Listitem, run, utils
-import urlquick
 
 # Localized string Constants
 TAGS = 20459
@@ -49,20 +48,20 @@ def extract_videos(lbl_tags, elem, date_format):
 # ###### Callbacks ###### #
 
 @Route.register
-def root(_):
+def root(plugin):
     """
     Lists all categories and link's to 'Shows', 'MsMojo' and 'All videos'.
 
     site: http://www.watchmojo.com
 
-    :param Route _: Tools related to callback.
+    :param Route plugin: Tools related to callback.
     :return: A generator of listitems.
     """
-    url = url_constructor("/")
-    source = urlquick.get(url)
-
     # Item youtube link as a all videos option
     yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")
+
+    url = url_constructor("/")
+    source = plugin.request.get(url)
 
     # Parse only the main category elements
     root_elem = source.parse()
@@ -99,7 +98,7 @@ def video_list(plugin, url):
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = urlquick.get(url)
+    source = plugin.request.get(url)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -126,7 +125,7 @@ def related(plugin, url):
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = urlquick.get(url)
+    source = plugin.request.get(url)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -136,18 +135,18 @@ def related(plugin, url):
 
 
 @Route.register
-def tags(_, url):
+def tags(plugin, url):
     """
     List tags for a video.
 
     site: http://www.watchmojo.com/video/id/19268/
 
-    :param Route _: Tools related to Route callbacks.
+    :param Route plugin: Tools related to Route callbacks.
     :param unicode url: The url to a video.
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = urlquick.get(url)
+    source = plugin.request.get(url)
 
     # Parse all video tags
     root_elem = source.parse("div", attrs={"id": "tags"})
