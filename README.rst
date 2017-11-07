@@ -13,7 +13,7 @@ Movies, Music, TV, Film, Video Games, Politics, News, Comics and Superheroes. Wa
 has ten thousand videos on Top 10 lists, Origins, Biographies, Tips, How To’s, Reviews,
 Commentary and moreYour trusted authority on ranking Pop Culture.
 
-The add-on is available in the official kodi repository and is available on kodi v17 "Krypton" and greater.
+The add-on is available in the official kodi repository for kodi v17 "Krypton" and greater.
 
 .. image:: resources/screenshots/screenshot000.jpg
 .. image:: resources/screenshots/screenshot001.jpg
