@@ -13,7 +13,7 @@ class Tester(unittest.TestCase):
         self.assertGreaterEqual(len(data), 20)
 
     def test_youtube_channel(self):
-        data = youtube.Playlists.test("UCaWd5_7JhbQBe4dknZhsHJg")
+        data = youtube.Playlist.test("UCaWd5_7JhbQBe4dknZhsHJg")
         self.assertGreaterEqual(len(data), 50)
 
     def test_video_list_music(self):
