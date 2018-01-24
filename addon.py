@@ -19,12 +19,41 @@
 
 from __future__ import unicode_literals
 from codequick import Route, Resolver, Listitem, run, utils
+import re
 
 # Localized string Constants
 TAGS = 20459
 
 # Base url constructor
-url_constructor = utils.urljoin_partial("http://www.watchmojo.com")
+url_constructor = utils.urljoin_partial("https://www.watchmojo.com")
+
+# Patterens to extract video url
+# Copied from the Youtube-DL project
+# https://github.com/rg3/youtube-dl/blob/4471affc348af40409188f133786780edd969623/youtube_dl/extractor/youtube.py#L329
+VALID_URL = r"""(?x)^
+(
+ (?:https?://|//)                                     # http(s):// or protocol-independent URL
+ (?:(?:(?:(?:\w+\.)?[yY][oO][uU][tT][uU][bB][eE](?:-nocookie)?\.com/|
+    youtube\.googleapis\.com/)                        # the various hostnames, with wildcard subdomains
+ (?:.*?\#/)?                                          # handle anchor (#/) redirect urls
+ (?:                                                  # the various things that can precede the ID:
+     (?:(?:v|embed|e)/(?!videoseries))                # v/ or embed/ or e/
+     |(?:                                             # or the v= param in all its forms
+         (?:(?:watch|movie)(?:_popup)?(?:\.php)?/?)?  # preceding watch(_popup|.php) or nothing (like /?v=xxxx)
+         (?:\?|\#!?)                                  # the params delimiter ? or # or #!
+         (?:.*?[&;])??                                # any other preceding param (like /?s=tuff&v=xxxx or
+         v=                                           # ?s=tuff&amp;v=V36LpHqtcDY)
+     )
+ ))
+ |(?:
+    youtu\.be|                                        # just youtu.be/xxxx
+    vid\.plus|                                        # or vid.plus/xxxx
+    zwearz\.com/watch|                                # or zwearz.com/watch/xxxx
+ ))
+)?                                                       # all until now is optional -> you can pass the naked ID
+([0-9A-Za-z_-]{11})                                      # here is it! the YouTube video ID
+(?(1).+)?                                                # if we found the ID, everything can follow
+$"""
 
 
 # ###### Functions ###### #
@@ -62,7 +91,7 @@ def root(plugin):
     yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")
 
     url = url_constructor("/")
-    source = plugin.request.get(url)
+    source = plugin.request.get(url, verify=False)
 
     # Parse only the main category elements
     root_elem = source.parse()
@@ -73,7 +102,7 @@ def root(plugin):
         item = Listitem()
         item.label = img_tag.get("alt")
         item.art["thumb"] = url_constructor(img_tag.get("src"))
-        item.set_callback(video_list, url=elem.find("a").get("href").replace("/i/home/", "http://"))
+        item.set_callback(video_list, url=elem.find("a").get("href").replace("/i/home/", "https://"))
         yield item
 
     # Parse only the show category elements
@@ -99,7 +128,7 @@ def video_list(plugin, url):
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = plugin.request.get(url)
+    source = plugin.request.get(url, verify=False)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -126,7 +155,7 @@ def related(plugin, url):
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = plugin.request.get(url)
+    source = plugin.request.get(url, verify=False)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -140,14 +169,14 @@ def tags(plugin, url):
     """
     List tags for a video.
 
-    site: http://www.watchmojo.com/video/id/19268/
+    site: https://www.watchmojo.com/video/id/19268/
 
     :param Route plugin: Tools related to Route callbacks.
     :param unicode url: The url to a video.
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = plugin.request.get(url)
+    source = plugin.request.get(url, verify=False)
 
     # Parse all video tags
     root_elem = source.parse("div", attrs={"id": "tags"})
@@ -158,19 +187,40 @@ def tags(plugin, url):
         yield item
 
 
+def embeded_videos(video_elem):
+    urls = []
+    urls.extend(video_elem.findall(".//iframe[@src]"))
+    urls.extend(video_elem.findall(".//embed[@src]"))
+    for url in urls:
+        yield url.get("src")
+
+
 @Resolver.register
 def play_video(plugin, url):
     """
     Resolve video url.
 
-    site: http://www.watchmojo.com/video/id/19268/
+    site: https://www.watchmojo.com/video/id/19268/
 
     :param Resolver plugin: Tools related to Resolver callbacks.
     :param unicode url: The url to a video.
     :return: A playable video url.
     """
     url = url_constructor(url)
-    return plugin.extract_source(url)
+    html = plugin.request.get(url, verify=False, max_age=0)
+
+    try:
+        video_elem = html.parse("div", attrs={"id": "mainplayer"})
+    except RuntimeError:
+        return None
+
+    # Attemp to find url using extract_source(YTDL) first
+    video_urls = embeded_videos(video_elem)
+    for url in video_urls:
+        match = re.match(VALID_URL, url)
+        if match is not None:
+            videoid = match.group(2)
+            return "plugin://plugin.video.youtube/play/?video_id={}".format(videoid)
 
 
 if __name__ == "__main__":

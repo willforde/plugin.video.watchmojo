@@ -1,10 +1,8 @@
-from addondev import initializer
-import os
-
-initializer(os.path.dirname(os.path.dirname(__file__)))
 import unittest
-import addon
+
+# Testing specific imports
 from codequick import youtube
+import addon
 
 
 class Tester(unittest.TestCase):
