@@ -19,41 +19,12 @@
 
 from __future__ import unicode_literals
 from codequick import Route, Resolver, Listitem, run, utils
-import re
 
 # Localized string Constants
 TAGS = 20459
 
 # Base url constructor
 url_constructor = utils.urljoin_partial("https://www.watchmojo.com")
-
-# Patterens to extract video url
-# Copied from the Youtube-DL project
-# https://github.com/rg3/youtube-dl/blob/4471affc348af40409188f133786780edd969623/youtube_dl/extractor/youtube.py#L329
-VALID_URL = r"""(?x)^
-(
- (?:https?://|//)                                     # http(s):// or protocol-independent URL
- (?:(?:(?:(?:\w+\.)?[yY][oO][uU][tT][uU][bB][eE](?:-nocookie)?\.com/|
-    youtube\.googleapis\.com/)                        # the various hostnames, with wildcard subdomains
- (?:.*?\#/)?                                          # handle anchor (#/) redirect urls
- (?:                                                  # the various things that can precede the ID:
-     (?:(?:v|embed|e)/(?!videoseries))                # v/ or embed/ or e/
-     |(?:                                             # or the v= param in all its forms
-         (?:(?:watch|movie)(?:_popup)?(?:\.php)?/?)?  # preceding watch(_popup|.php) or nothing (like /?v=xxxx)
-         (?:\?|\#!?)                                  # the params delimiter ? or # or #!
-         (?:.*?[&;])??                                # any other preceding param (like /?s=tuff&v=xxxx or
-         v=                                           # ?s=tuff&amp;v=V36LpHqtcDY)
-     )
- ))
- |(?:
-    youtu\.be|                                        # just youtu.be/xxxx
-    vid\.plus|                                        # or vid.plus/xxxx
-    zwearz\.com/watch|                                # or zwearz.com/watch/xxxx
- ))
-)?                                                       # all until now is optional -> you can pass the naked ID
-([0-9A-Za-z_-]{11})                                      # here is it! the YouTube video ID
-(?(1).+)?                                                # if we found the ID, everything can follow
-$"""
 
 
 # ###### Functions ###### #
@@ -63,9 +34,9 @@ def extract_videos(lbl_tags, elem, date_format):
     item.label = elem.findtext(".//div[@class='hptitle']").replace("\t", " ").strip()
     item.art["thumb"] = url_constructor(elem.find(".//img").get("src"))
 
-    duration = elem.find(".//img[@class='hpplay']").tail
-    if duration:
-        item.info["duration"] = duration.strip(";")
+    duration = elem.find(".//img[@class='hpplay']")
+    if duration is not None and duration.tail:
+        item.info["duration"] = duration.tail.strip(";")
 
     url = elem.find("a").get("href")
     item.info.date(elem.findtext(".//div[@class='hpdate']").strip(), date_format)
@@ -92,24 +63,13 @@ def root(plugin):
 
     url = url_constructor("/")
     source = plugin.request.get(url, verify=False)
-
-    # Parse only the main category elements
     root_elem = source.parse()
-    for elem in root_elem.find(".//div[@id='owl-demo4']").iterfind("div"):
-        # Image element contains image url and label as the alt attribute
-        img_tag = elem.find("./a/img")
-
-        item = Listitem()
-        item.label = img_tag.get("alt")
-        item.art["thumb"] = url_constructor(img_tag.get("src"))
-        item.set_callback(video_list, url=elem.find("a").get("href").replace("/i/home/", "https://"))
-        yield item
 
     # Parse only the show category elements
     menu_elem = root_elem.find(".//ul[@class='top-ul left']")
     for elem in menu_elem.iterfind(".//a"):
         url = elem.get("href")
-        if url and elem.text and (url.startswith("/shows/") or url.startswith("/msmojo/")):
+        if url and elem.text:
             item = Listitem()
             item.label = elem.text
             item.set_callback(video_list, url=url)
@@ -133,8 +93,10 @@ def video_list(plugin, url):
 
     # Parse all the video elements
     root_elem = source.parse()
-    for elem in root_elem.iterfind(".//div[@class='item']"):
-        yield extract_videos(lbl_tags, elem, "%b %d, %Y")
+
+    for line in root_elem.iterfind(".//div[@class='owl-carousel margin-bottom']"):
+        for elem in line.iterfind(".//div[@class='item']"):
+            yield extract_videos(lbl_tags, elem, "%b %d, %Y")
 
     # Add link to next page if available
     next_page = root_elem.find(".//div[@class='cat-next']")
@@ -187,14 +149,6 @@ def tags(plugin, url):
         yield item
 
 
-def embeded_videos(video_elem):
-    urls = []
-    urls.extend(video_elem.findall(".//iframe[@src]"))
-    urls.extend(video_elem.findall(".//embed[@src]"))
-    for url in urls:
-        yield url.get("src")
-
-
 @Resolver.register
 def play_video(plugin, url):
     """
@@ -208,19 +162,9 @@ def play_video(plugin, url):
     """
     url = url_constructor(url)
     html = plugin.request.get(url, verify=False, max_age=0)
+    video_elem = html.parse("div", attrs={"class": "scalable-content"})
 
-    try:
-        video_elem = html.parse("div", attrs={"id": "mainplayer"})
-    except RuntimeError:
-        return None
-
-    # Attemp to find url using extract_source(YTDL) first
-    video_urls = embeded_videos(video_elem)
-    for url in video_urls:
-        match = re.match(VALID_URL, url)
-        if match is not None:
-            videoid = match.group(2)
-            return "plugin://plugin.video.youtube/play/?video_id={}".format(videoid)
+    return plugin.extract_youtube(video_elem)
 
 
 if __name__ == "__main__":
