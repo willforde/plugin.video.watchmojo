@@ -172,7 +172,7 @@ def play_video(plugin, url):
 
     # Check for cloudfront.net video
     video = video_elem.find(".//video/source[@src]")
-    if video is not None:
+    if video is not None:  # pragma: no branch
         return video.get("src")
 
 
