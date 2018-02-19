@@ -58,8 +58,11 @@ def root(plugin):
     :param Route plugin: Tools related to callback.
     :return: A generator of listitems.
     """
-    # Item youtube link as a all videos option
+    # Add youtube link as a all videos option
     yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")
+
+    # Add Watchmojo uk
+    yield Listitem.youtube("UCMm0YNfHOCA-bvHmOBSx-ZA", label="WatchMojo UK")
 
     url = url_constructor("/")
     source = plugin.request.get(url, verify=False)
