@@ -65,7 +65,7 @@ def root(plugin):
     yield Listitem.youtube("UCMm0YNfHOCA-bvHmOBSx-ZA", label="WatchMojo UK")
 
     url = url_constructor("/")
-    source = plugin.request.get(url, verify=False)
+    source = plugin.request.get(url)
     root_elem = source.parse()
 
     # Parse only the show category elements
@@ -91,7 +91,7 @@ def video_list(plugin, url):
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = plugin.request.get(url, verify=False)
+    source = plugin.request.get(url)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -120,7 +120,7 @@ def related(plugin, url):
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = plugin.request.get(url, verify=False)
+    source = plugin.request.get(url)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -141,7 +141,7 @@ def tags(plugin, url):
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = plugin.request.get(url, verify=False)
+    source = plugin.request.get(url)
 
     # Parse all video tags
     root_elem = source.parse("div", attrs={"id": "tags"})
@@ -164,7 +164,7 @@ def play_video(plugin, url):
     :return: A playable video url.
     """
     url = url_constructor(url)
-    html = plugin.request.get(url, verify=False, max_age=0)
+    html = plugin.request.get(url, max_age=0)
     video_elem = html.parse("div", attrs={"id": "question"})
     resolved_url = plugin.extract_youtube(video_elem)
     if resolved_url:
