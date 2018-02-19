@@ -165,9 +165,15 @@ def play_video(plugin, url):
     """
     url = url_constructor(url)
     html = plugin.request.get(url, verify=False, max_age=0)
-    video_elem = html.parse("div", attrs={"class": "scalable-content"})
+    video_elem = html.parse("div", attrs={"id": "question"})
+    resolved_url = plugin.extract_youtube(video_elem)
+    if resolved_url:
+        return resolved_url
 
-    return plugin.extract_youtube(video_elem)
+    # Check for cloudfront.net video
+    video = video_elem.find(".//video/source[@src]")
+    if video is not None:
+        return video.get("src")
 
 
 if __name__ == "__main__":
