@@ -5,8 +5,8 @@ from codequick import youtube
 import codequick
 import addon
 
-# Check if we are runing the dev version of codequick
-dev_version = codequick.__dict__.get("__version__", (0, 9, 0)) >= (0, 9, 2)
+# Check witch version of codequick we are running
+framework_version = codequick.__dict__.get("__version__", (0, 9, 0))
 
 
 class Tester(unittest.TestCase):
@@ -58,12 +58,12 @@ class Tester(unittest.TestCase):
         data = addon.tags.test("http://www.watchmojo.com/video/id/19541/")
         self.assertGreaterEqual(len(data), 5)
 
-    @unittest.skipUnless(dev_version, "Only work on the dev version of codequick")
+    @unittest.skipUnless(framework_version >= (0, 9, 2), "Only work on v0.9.2 and up of codequick")
     def test_play_video_type1(self):
         ret = addon.play_video.test(u"https://www.watchmojo.com/video/id/19268/")
         self.assertEqual(ret, u"plugin://plugin.video.youtube/play/?video_id=Fi2qpF2q5vk")
 
-    @unittest.skipUnless(dev_version, "Only work on the dev version of codequick")
+    @unittest.skipUnless(framework_version >= (0, 9, 2), "Only work on v0.9.2 and up of codequick")
     def test_play_video_type2(self):
         ret = addon.play_video.test(u"https://www.watchmojo.com/video/id/20838/")
         self.assertEqual(ret, u"plugin://plugin.video.youtube/play/?video_id=P3PvFiCibts")
