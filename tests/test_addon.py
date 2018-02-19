@@ -14,8 +14,12 @@ class Tester(unittest.TestCase):
         data = addon.root.test()
         self.assertGreaterEqual(len(data), 20)
 
-    def test_youtube_channel(self):
+    def test_youtube_channel_watchmojo(self):
         data = youtube.Playlist.test("UCaWd5_7JhbQBe4dknZhsHJg")
+        self.assertGreaterEqual(len(data), 50)
+
+    def test_youtube_channel_watchmojo_uk(self):
+        data = youtube.Playlist.test("UCMm0YNfHOCA-bvHmOBSx-ZA")
         self.assertGreaterEqual(len(data), 50)
 
     def test_video_list_music(self):
