@@ -19,6 +19,7 @@
 
 from __future__ import unicode_literals
 from codequick import Route, Resolver, Listitem, run, utils
+import urlquick
 
 # Localized string Constants
 TAGS = 20459
@@ -49,13 +50,13 @@ def extract_videos(lbl_tags, elem, date_format):
 # ###### Callbacks ###### #
 
 @Route.register
-def root(plugin):
+def root(_):
     """
     Lists all categories and link's to 'Shows', 'MsMojo' and 'All videos'.
 
     site: http://www.watchmojo.com
 
-    :param Route plugin: Tools related to callback.
+    :param Route _: Tools related to callback.
     :return: A generator of listitems.
     """
     # Add youtube link as a all videos option
@@ -65,7 +66,7 @@ def root(plugin):
     yield Listitem.youtube("UCMm0YNfHOCA-bvHmOBSx-ZA", label="WatchMojo UK")
 
     url = url_constructor("/")
-    source = plugin.request.get(url)
+    source = urlquick.get(url)
     root_elem = source.parse()
 
     # Parse only the show category elements
@@ -91,7 +92,7 @@ def video_list(plugin, url):
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = plugin.request.get(url)
+    source = urlquick.get(url)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -120,7 +121,7 @@ def related(plugin, url):
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = plugin.request.get(url)
+    source = urlquick.get(url)
     lbl_tags = plugin.localize(TAGS)
 
     # Parse all the video elements
@@ -130,18 +131,18 @@ def related(plugin, url):
 
 
 @Route.register
-def tags(plugin, url):
+def tags(_, url):
     """
     List tags for a video.
 
     site: https://www.watchmojo.com/video/id/19268/
 
-    :param Route plugin: Tools related to Route callbacks.
+    :param Route _: Tools related to Route callbacks.
     :param unicode url: The url to a video.
     :return: A generator of listitems.
     """
     url = url_constructor(url)
-    source = plugin.request.get(url)
+    source = urlquick.get(url)
 
     # Parse all video tags
     root_elem = source.parse("div", attrs={"id": "tags"})
@@ -164,7 +165,7 @@ def play_video(plugin, url):
     :return: A playable video url.
     """
     url = url_constructor(url)
-    html = plugin.request.get(url, max_age=0)
+    html = urlquick.get(url, max_age=0)
     video_elem = html.parse("div", attrs={"id": "question"})
     resolved_url = plugin.extract_youtube(video_elem)
     if resolved_url:
