@@ -71,8 +71,3 @@ class Tester(unittest.TestCase):
     def test_play_video_type2(self):
         ret = addon.play_video.test(u"https://www.watchmojo.com/video/id/20838/")
         self.assertEqual(ret, u"plugin://plugin.video.youtube/play/?video_id=P3PvFiCibts")
-
-    @unittest.skipUnless(framework_version >= (0, 9, 2), "Only work on v0.9.2 and up of codequick")
-    def test_play_video_cloudfront(self):
-        ret = addon.play_video.test(u"https://www.watchmojo.com/video/id/20908/")
-        self.assertEqual(ret, "http://d1w0hpjgs8j5kt.cloudfront.net/85da08c69d00f296be9f1ff048bbc398.mp4")
