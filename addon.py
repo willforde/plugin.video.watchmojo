@@ -59,11 +59,10 @@ def root(_):
     :param Route _: Tools related to callback.
     :return: A generator of listitems.
     """
-    # Add youtube link as a all videos option
-    yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")
-
-    # Add Watchmojo uk
+    # Add links to watchmojo youtube channels
+    yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")  # WatchMojo
     yield Listitem.youtube("UCMm0YNfHOCA-bvHmOBSx-ZA", label="WatchMojo UK")
+    yield Listitem.youtube("UC3rLoj87ctEHCcS7BuvIzkQ", label="MsMojo")
 
     url = url_constructor("/")
     source = urlquick.get(url)
@@ -73,7 +72,7 @@ def root(_):
     menu_elem = root_elem.find(".//ul[@class='top-ul left']")
     for elem in menu_elem.iterfind(".//a"):
         url = elem.get("href")
-        if url and elem.text:
+        if url and elem.text and elem.text != "MsMojo":
             item = Listitem()
             item.label = elem.text
             item.set_callback(video_list, url=url)
