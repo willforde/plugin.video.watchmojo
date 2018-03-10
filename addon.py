@@ -164,9 +164,7 @@ def play_video(plugin, url):
     :return: A playable video url.
     """
     url = url_constructor(url)
-    html = urlquick.get(url, max_age=0)
-    video_elem = html.parse("div", attrs={"id": "question"})
-    return plugin.extract_youtube(video_elem)
+    return plugin.extract_source(url)
 
 
 if __name__ == "__main__":
