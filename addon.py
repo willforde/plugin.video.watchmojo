@@ -41,7 +41,7 @@ def extract_videos(lbl_tags, elem, date_format):
 
     url = elem.find("a").get("href")
     item.info.date(elem.findtext(".//div[@class='hpdate']").strip(), date_format)
-    item.context.container(lbl_tags, tags, url=url)
+    item.context.container(tags, lbl_tags, url=url)
     item.context.related(related, url=url)
     item.set_callback(play_video, url=url)
     return item
