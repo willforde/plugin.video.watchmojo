@@ -54,6 +54,10 @@ class Tester(unittest.TestCase):
         data = addon.video_list.test("/categories/music/2")
         self.assertGreaterEqual(len(data), 40)
 
+    def test_video_list_tags(self):
+        data = addon.video_list.test("/tag/Film/1")
+        self.assertGreaterEqual(len(data), 40)
+
     def test_related(self):
         data = addon.related.test("http://www.watchmojo.com/video/id/19541/")
         self.assertGreaterEqual(len(data), 12)
