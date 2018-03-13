@@ -130,16 +130,17 @@ def related(plugin, url):
 
 
 @Route.register
-def tags(_, url):
+def tags(plugin, url):
     """
     List tags for a video.
 
     site: https://www.watchmojo.com/video/id/19268/
 
-    :param Route _: Tools related to Route callbacks.
+    :param Route plugin: Tools related to Route callbacks.
     :param unicode url: The url to a video.
     :return: A generator of listitems.
     """
+    plugin.category = plugin.localize(TAGS)
     url = url_constructor(url)
     source = urlquick.get(url)
 
@@ -148,7 +149,7 @@ def tags(_, url):
     for elem in root_elem.iterfind("a"):
         item = Listitem()
         item.label = elem.text.title()
-        item.set_callback(video_list, url=elem.get("href"))
+        item.set_callback(video_list, url="%s1" % elem.get("href"))
         yield item
 
 
