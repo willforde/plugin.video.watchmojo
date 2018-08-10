@@ -72,7 +72,7 @@ def root(_):
     root_elem = source.parse()
 
     # Parse only the show category elements
-    menu_elem = root_elem.find(".//ul[@class='top-ul left']")
+    menu_elem = root_elem.find(".//ul[@class='top-ul left']/li/ul")
     for elem in menu_elem.iterfind(".//a"):
         url = elem.get("href")
         if url and elem.text and elem.text != "MsMojo":
