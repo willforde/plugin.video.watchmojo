@@ -39,8 +39,11 @@ def extract_videos(lbl_tags, elem, date_format):
     if duration is not None and duration.tail:
         item.info["duration"] = duration.tail.strip(";")
 
+    date = elem.findtext(".//div[@class='hpdate']").strip()
+    if date:
+        item.info.date(date, date_format)
+
     url = elem.find("a").get("href")
-    item.info.date(elem.findtext(".//div[@class='hpdate']").strip(), date_format)
     item.context.container(tags, lbl_tags, url=url)
     item.context.related(related, url=url)
     item.set_callback(play_video, url=url)
