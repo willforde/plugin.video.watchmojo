@@ -24,6 +24,6 @@
             <screenshot>resources/screenshots/screenshot001.jpg</screenshot>
             <screenshot>resources/screenshots/screenshot002.jpg</screenshot>
         </assets>
-        <news>[fix] Fixed playback problem with Kodi on Xbox.\n[fix] Fixed SSL verification failure, preventing add-on from working.\n[upd] Add WatchMojo UK channel.</news>
+        <news>[fix] Fix some scraping issues that added some useless entries.</news>
     </extension>
 </addon>
