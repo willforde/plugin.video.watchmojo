@@ -9,7 +9,7 @@
 
 Watchmojo
 =========
-.. image:: resources/icon.png
+.. image:: plugin.video.watchmojo/resources/icon.png
 
 This is a kodi video add-on for Watchmojo Top 10 lists on Music, TV, Film and Video Games.
 
@@ -23,8 +23,8 @@ Download
 --------
 The add-on is available in the official kodi repository for kodi v17 "Krypton" and later.
 
-.. image:: resources/screenshots/screenshot000.jpg
-.. image:: resources/screenshots/screenshot001.jpg
-.. image:: resources/screenshots/screenshot002.jpg
+.. image:: plugin.video.watchmojo/resources/screenshots/screenshot000.jpg
+.. image:: plugin.video.watchmojo/resources/screenshots/screenshot001.jpg
+.. image:: plugin.video.watchmojo/resources/screenshots/screenshot002.jpg
 
 **Automated Tests:** https://travis-ci.org/willforde/plugin.video.watchmojo
