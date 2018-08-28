@@ -17,12 +17,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-import sys
-import os
-
-lib = os.path.join(os.path.dirname(__file__), "resources", "lib")
-sys.path.append(lib)
-
-import main
+from resources.lib import main
 if __name__ == "__main__":
     main.run()
