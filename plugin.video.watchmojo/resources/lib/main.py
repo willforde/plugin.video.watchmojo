@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
+
+# noinspection PyUnresolvedReferences
 from codequick import Route, Resolver, Listitem, utils, run
 import urlquick
 
