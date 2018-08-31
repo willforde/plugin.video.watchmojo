@@ -7,8 +7,8 @@
 .. image:: https://api.codacy.com/project/badge/Grade/31a9578f9a004453b4bb590c50d12579
     :target: https://www.codacy.com/app/willforde/plugin.video.watchmojo?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=willforde/plugin.video.watchmojo&amp;utm_campaign=Badge_Grade
 
-Watchmojo
-=========
+Watchmojo -> https://www.watchmojo.com
+======================================
 .. image:: plugin.video.watchmojo/resources/icon.png
 
 This is a kodi video add-on for Watchmojo Top 10 lists on Music, TV, Film and Video Games.
