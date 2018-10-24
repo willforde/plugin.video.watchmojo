@@ -9,7 +9,8 @@ import urlquick
 TAGS = 20459
 
 # Base url constructor
-url_constructor = utils.urljoin_partial("https://www.watchmojo.com")
+base_url = "https://www.watchmojo.com"
+url_constructor = utils.urljoin_partial(base_url)
 
 
 # ###### Functions ###### #
@@ -50,12 +51,13 @@ def root(_):
     url = url_constructor("/")
     source = urlquick.get(url)
     root_elem = source.parse()
+    unwanted = ["watchmojo uk", "msmojo"]
 
     # Parse only the show category elements
     menu_elem = root_elem.find(".//ul[@class='top-ul left']/li/ul")
     for elem in menu_elem.iterfind(".//a"):
         url = elem.get("href")
-        if url and elem.text and elem.text != "MsMojo":
+        if url and elem.text and elem.text.lower() not in unwanted:
             item = Listitem()
             item.label = elem.text
             item.set_callback(video_list, url=url)

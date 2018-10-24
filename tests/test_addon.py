@@ -12,7 +12,7 @@ framework_version = codequick.__dict__.get("__version__", (0, 9, 0))
 class Tester(unittest.TestCase):
     def test_root(self):
         data = addon.root.test()
-        self.assertGreaterEqual(len(data), 20)
+        self.assertGreaterEqual(len(data), 17)
 
     def test_youtube_channel_watchmojo(self):
         data = youtube.Playlist.test("UCaWd5_7JhbQBe4dknZhsHJg")
