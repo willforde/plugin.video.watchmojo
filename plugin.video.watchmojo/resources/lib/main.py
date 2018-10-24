@@ -10,8 +10,8 @@ TAGS = 20459
 FEATURED_VIDEO = 30001
 
 # Base url constructor
-base_url = "https://www.watchmojo.com"
-url_constructor = utils.urljoin_partial(base_url)
+BASE_URL = "https://www.watchmojo.com"
+url_constructor = utils.urljoin_partial(BASE_URL)
 
 
 # ###### Functions ###### #
@@ -51,8 +51,7 @@ def root(plugin):
     yield Listitem.youtube("UCMm0YNfHOCA-bvHmOBSx-ZA", label="WatchMojo UK")
     yield Listitem.youtube("UC3rLoj87ctEHCcS7BuvIzkQ", label="MsMojo")
 
-    url = url_constructor("/")
-    source = urlquick.get(url)
+    source = urlquick.get(BASE_URL)
     root_elem = source.parse()
     unwanted = ["watchmojo uk", "msmojo"]
 
@@ -159,11 +158,9 @@ def play_featured_video(plugin):
 
     :param Resolver plugin: Tools related to Resolver callbacks.
     """
-    video_url = plugin.extract_source(base_url)
-
-    resp = urlquick.get(base_url)
+    video_url = play_video(plugin, BASE_URL)
+    resp = urlquick.get(BASE_URL)
     elem = resp.parse("div", attrs={"class": "cal_title"})
     title = elem[0].text
-
     if video_url:
         return {title: video_url}
