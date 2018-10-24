@@ -7,6 +7,7 @@ import urlquick
 
 # Localized string Constants
 TAGS = 20459
+FEATURED_VIDEO = 30001
 
 # Base url constructor
 base_url = "https://www.watchmojo.com"
@@ -38,10 +39,12 @@ def extract_videos(lbl_tags, elem, date_format):
 # ###### Callbacks ###### #
 
 @Route.register
-def root(_):
+def root(plugin):
     """
     Lists all categories and link's to 'Shows', 'MsMojo' and 'All videos'.
     site: http://www.watchmojo.com
+
+    :param Route plugin: Tools related to Route callbacks.
     """
     # Add links to watchmojo youtube channels
     yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")  # WatchMojo
@@ -62,6 +65,9 @@ def root(_):
             item.label = elem.text
             item.set_callback(video_list, url=url)
             yield item
+
+    # Add Featured Video
+    yield Listitem.from_dict(play_featured_video, plugin.localize(FEATURED_VIDEO))
 
 
 @Route.register
@@ -143,3 +149,21 @@ def play_video(plugin, url):
     """
     url = url_constructor(url)
     return plugin.extract_source(url)
+
+
+@Resolver.register
+def play_featured_video(plugin):
+    """
+    Resolve video url.
+    site: https://www.watchmojo.com/video/id/19268/
+
+    :param Resolver plugin: Tools related to Resolver callbacks.
+    """
+    video_url = plugin.extract_source(base_url)
+
+    resp = urlquick.get(base_url)
+    elem = resp.parse("div", attrs={"class": "cal_title"})
+    title = elem[0].text
+
+    if video_url:
+        return {title: video_url}
