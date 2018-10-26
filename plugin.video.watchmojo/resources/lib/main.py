@@ -48,6 +48,7 @@ def root(plugin):
     """
     # Add links to watchmojo youtube channels
     yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")  # WatchMojo
+    yield Listitem.search(search_results)
     yield Listitem.youtube("UCMm0YNfHOCA-bvHmOBSx-ZA", label="WatchMojo UK")
     yield Listitem.youtube("UC9_eukrzdzY91jjDZm62FXQ", label="MojoTravels")
     yield Listitem.youtube("UC4HnC-AS714lT2TCTJ-A1zQ", label="MojoPlays")
@@ -144,7 +145,39 @@ def tags(plugin, url):
     for elem in root_elem.iterfind("a"):
         item = Listitem()
         item.label = elem.text.title()
-        item.set_callback(video_list, url="%s1" % elem.get("href"))
+        search_term = elem.get("href").rsplit("=", 1)[1]
+        item.set_callback(search_results, search_term)
+        yield item
+
+
+@Route.register
+def search_results(_, search_query):
+    """
+    List search results
+
+    :param Route _: Tools related to Route callbacks.
+    :param search_query: The search term to find results for.
+    """
+    url = url_constructor("/search/search_1018.php?q={}&query=".format(search_query))
+    source = urlquick.get(url)
+    root_elem = source.parse()
+
+    for elem in root_elem.iterfind(".//li"):
+        item = Listitem()
+
+        atag = elem.find("a")
+        item.art["thumb"] = url_constructor(atag.find("img").get("src"))
+        item.info["plot"] = elem.find("div").text.strip()
+
+        # Extrac all title segments and join
+        title = [atag.text]
+        for i in atag:
+            title.append(i.text)
+            title.append(i.tail)
+        item.label = "".join(filter(None, title))
+
+        url = atag.get("href")
+        item.set_callback(play_video, url=url)
         yield item
 
 
