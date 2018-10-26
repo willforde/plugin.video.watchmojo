@@ -163,4 +163,7 @@ def play_featured_video(plugin):
     elem = resp.parse("div", attrs={"class": "cal_title"})
     title = elem[0].text
     if video_url:
-        return {title: video_url}
+        # Using xbmcgui.ListItem just for setting plot info
+        item = __import__("xbmcgui").ListItem(title, path=video_url)
+        item.setInfo("video", {"title": title, "plot": title})
+        return item
