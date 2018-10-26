@@ -58,16 +58,25 @@ def root(plugin):
     source = urlquick.get(BASE_URL)
     root_elem = source.parse()
 
-    # Parse only the show category elements
-    menu_elem = root_elem.find(".//ul[@class='top-ul left']/li/ul/li")
-    for elem in menu_elem.iterfind(".//a"):
-        item = Listitem()
+    # Find each category and fetch the image for the first video in the list
+    for elem in root_elem.iterfind("./body/section/div[@class='line']"):
+        # If we have a 'link' tag with class=more, then we are in the right section
+        tag = elem.find("a[@class='more']")
+        if tag is not None:
+            url = tag.get("href")
+            # Only list category entrys
+            if url.startswith("/categories"):
+                item = Listitem()
 
-        url = elem.get("href")
-        item.label = elem.text
-        item.set_callback(video_list, url=url)
-        yield item
+                item.label = elem.find("h2").text.strip().title()
+                item.art["thumb"] = url_constructor(elem.find(".//img").get("src"))
+                item.set_callback(video_list, url=url)
+                yield item
 
+    # Add link to exclusive watchmojo video
+    yield Listitem.from_dict(video_list, "Exclusive", params={"url": "/exclusive/1"},
+                             art={"thumb": "https://www.watchmojo.com/uploads/blipthumbs/Fi-M-Top10-Well-"
+                                           "Regarded-Controversial-Films_R7D2Y7-720p30-C_480.jpg"})
     # Add Featured Video
     yield Listitem.from_dict(play_featured_video, plugin.localize(FEATURED_VIDEO))
 
