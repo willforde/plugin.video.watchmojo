@@ -96,7 +96,6 @@ def video_list(plugin, url):
 
     # Parse all the video elements
     root_elem = source.parse()
-
     for line in root_elem.iterfind(".//div[@class='owl-carousel margin-bottom']"):
         for elem in line.iterfind(".//div[@class='item']"):
             yield extract_videos(lbl_tags, elem, "%b %d, %Y")
