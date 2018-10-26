@@ -49,21 +49,24 @@ def root(plugin):
     # Add links to watchmojo youtube channels
     yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")  # WatchMojo
     yield Listitem.youtube("UCMm0YNfHOCA-bvHmOBSx-ZA", label="WatchMojo UK")
+    yield Listitem.youtube("UC9_eukrzdzY91jjDZm62FXQ", label="MojoTravels")
+    yield Listitem.youtube("UC4HnC-AS714lT2TCTJ-A1zQ", label="MojoPlays")
+    yield Listitem.youtube("UC88y_sxutS1mnoeBDroS74w", label="MojoTalks")
     yield Listitem.youtube("UC3rLoj87ctEHCcS7BuvIzkQ", label="MsMojo")
+    yield Listitem.youtube("UCYJyrEdlwxUu7UwtFS6jA_Q", label="UnVeiled")
 
     source = urlquick.get(BASE_URL)
     root_elem = source.parse()
-    unwanted = ["watchmojo uk", "msmojo"]
 
     # Parse only the show category elements
-    menu_elem = root_elem.find(".//ul[@class='top-ul left']/li/ul")
+    menu_elem = root_elem.find(".//ul[@class='top-ul left']/li/ul/li")
     for elem in menu_elem.iterfind(".//a"):
+        item = Listitem()
+
         url = elem.get("href")
-        if url and elem.text and elem.text.lower() not in unwanted:
-            item = Listitem()
-            item.label = elem.text
-            item.set_callback(video_list, url=url)
-            yield item
+        item.label = elem.text
+        item.set_callback(video_list, url=url)
+        yield item
 
     # Add Featured Video
     yield Listitem.from_dict(play_featured_video, plugin.localize(FEATURED_VIDEO))
