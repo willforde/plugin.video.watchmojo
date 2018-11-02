@@ -143,9 +143,15 @@ def tags(plugin, url):
     # Parse all video tags
     root_elem = source.parse("div", attrs={"id": "tags"})
     for elem in root_elem.iterfind("a"):
+        url = elem.get("href")
+        urlparams = utils.parse_qs(url)
+        if "q" in urlparams:
+            search_term = urlparams["q"]
+        else:
+            continue
+
         item = Listitem()
         item.label = elem.text.title()
-        search_term = elem.get("href").rsplit("=", 1)[1]
         item.set_callback(search_results, search_term)
         yield item
 
