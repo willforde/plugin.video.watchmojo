@@ -25,5 +25,6 @@
             <screenshot>resources/screenshots/screenshot002.jpg</screenshot>
         </assets>
         <news>[fix] Fix some scraping issues that added some useless entries.</news>
+        <reuselanguageinvoker>true</reuselanguageinvoker>
     </extension>
 </addon>
