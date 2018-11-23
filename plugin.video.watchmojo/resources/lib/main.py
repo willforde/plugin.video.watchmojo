@@ -205,7 +205,7 @@ def play_video(plugin, url):
     return plugin.extract_source(url)
 
 
-@Resolver.register
+# @Resolver.register
 def play_featured_video(plugin):
     """
     Resolve video url.
@@ -215,10 +215,14 @@ def play_featured_video(plugin):
     """
     video_url = play_video(plugin, BASE_URL)
     resp = urlquick.get(BASE_URL)
-    elem = resp.parse("div", attrs={"class": "cal_title"})
-    title = elem[0].text
-    if video_url:
-        # Using xbmcgui.ListItem just for setting plot info
-        item = __import__("xbmcgui").ListItem(title, path=video_url)
-        item.setInfo("video", {"title": title, "plot": title})
-        return item
+    try:
+        elem = resp.parse("div", attrs={"class": "cal_title"})
+    except RuntimeError:
+        return None
+    else:
+        title = elem[0].text
+        if video_url:
+            # Using xbmcgui.ListItem just for setting plot info
+            item = __import__("xbmcgui").ListItem(title, path=video_url)
+            item.setInfo("video", {"title": title, "plot": title})
+            return item
