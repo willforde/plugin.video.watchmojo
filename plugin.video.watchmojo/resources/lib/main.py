@@ -157,7 +157,7 @@ def tags(plugin, url):
 
 
 @Route.register
-def search_results(plugin, search_query):
+def search_results(_, search_query):
     """
     List search results
 
