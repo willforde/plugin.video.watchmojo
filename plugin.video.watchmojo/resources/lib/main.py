@@ -39,12 +39,10 @@ def extract_videos(lbl_tags, elem, date_format):
 # ###### Callbacks ###### #
 
 @Route.register
-def root(plugin):
+def root(_):
     """
     Lists all categories and link's to 'Shows', 'MsMojo' and 'All videos'.
     site: http://www.watchmojo.com
-
-    :param Route plugin: Tools related to Route callbacks.
     """
     # Add links to watchmojo youtube channels
     yield Listitem.youtube("UCaWd5_7JhbQBe4dknZhsHJg")  # WatchMojo
@@ -79,7 +77,8 @@ def root(plugin):
                              art={"thumb": "https://www.watchmojo.com/uploads/blipthumbs/Fi-M-Top10-Well-"
                                            "Regarded-Controversial-Films_R7D2Y7-720p30-C_480.jpg"})
     # Add Featured Video
-    yield Listitem.from_dict(play_featured_video, plugin.localize(FEATURED_VIDEO))
+    # yield Listitem.from_dict(play_featured_video, plugin.localize(FEATURED_VIDEO))
+    # This will be disabled for now, as watchmojo has disabled it on there site but may enable it again later on
 
 
 @Route.register
