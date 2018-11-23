@@ -157,23 +157,21 @@ def tags(plugin, url):
 
 
 @Route.register
-def search_results(_, search_query):
+def search_results(plugin, search_query):
     """
     List search results
 
     :param Route _: Tools related to Route callbacks.
     :param search_query: The search term to find results for.
     """
-    url = url_constructor("/search/search_1018.php?q={}&query=".format(search_query))
+    url = url_constructor("/search/search_1018.php?q={}&query=like".format(search_query))
     source = urlquick.get(url)
     root_elem = source.parse()
 
     for elem in root_elem.iterfind(".//li"):
         item = Listitem()
-
         atag = elem.find("a")
         item.art["thumb"] = url_constructor(atag.find("img").get("src"))
-        item.info["plot"] = elem.find("div").text.strip()
 
         # Extrac all title segments and join
         title = [atag.text]
@@ -181,6 +179,14 @@ def search_results(_, search_query):
             title.append(i.text)
             title.append(i.tail)
         item.label = "".join(filter(None, title))
+
+        # Extract plot
+        plot_node = elem.find("div")
+        plots = [plot_node.text]
+        for node in plot_node:
+            plots.append(node.text)
+            plots.append(node.tail)
+        item.info["plot"] = "".join(text.strip() for text in plots if text is not None)
 
         url = atag.get("href")
         item.set_callback(play_video, url=url)
