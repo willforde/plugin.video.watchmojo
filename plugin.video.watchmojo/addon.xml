@@ -24,7 +24,7 @@
             <screenshot>resources/screenshots/screenshot001.jpg</screenshot>
             <screenshot>resources/screenshots/screenshot002.jpg</screenshot>
         </assets>
-        <news>[fix] Fix some scraping issues that added some useless entries.</news>
+        <news>[fix] Fix some scraping issues that added some useless entries.\n [fix] Fix vodeo tags.</news>
         <reuselanguageinvoker>true</reuselanguageinvoker>
     </extension>
 </addon>
