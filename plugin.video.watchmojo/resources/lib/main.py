@@ -146,13 +146,11 @@ def tags(plugin, url):
         urlparams = utils.parse_qs(url)
         if "q" in urlparams:
             search_term = urlparams["q"]
-        else:
-            continue
 
-        item = Listitem()
-        item.label = elem.text.title()
-        item.set_callback(search_results, search_term)
-        yield item
+            item = Listitem()
+            item.label = elem.text.title()
+            item.set_callback(search_results, search_term)
+            yield item
 
 
 @Route.register
