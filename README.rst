@@ -28,3 +28,5 @@ The add-on is available in the official kodi repository for kodi v17 "Krypton" a
 .. image:: plugin.video.watchmojo/resources/screenshots/screenshot002.jpg
 
 **Automated Tests:** https://travis-ci.org/willforde/plugin.video.watchmojo
+
+**Kodi Forum:** https://forum.kodi.tv/showthread.php?tid=178802
