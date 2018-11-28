@@ -66,6 +66,10 @@ class Tester(unittest.TestCase):
         data = addon.tags.test("http://www.watchmojo.com/video/id/19541/")
         self.assertGreaterEqual(len(data), 5)
 
+    def test_search(self):
+        data = addon.search_results.test(search_query="games")
+        self.assertGreaterEqual(len(data), 25)
+
     @unittest.skip
     def test_play_video_type1(self):
         ret = addon.play_video.test(u"https://www.watchmojo.com/video/id/19268/")
