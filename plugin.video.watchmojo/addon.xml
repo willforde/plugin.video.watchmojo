@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.watchmojo" name="Watchmojo" provider-name="willforde" version="3.0.3">
+<addon id="plugin.video.watchmojo" name="Watchmojo" provider-name="willforde" version="3.1.0">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
-        <import addon="script.module.codequick" version="0.9.2"/>
+        <import addon="script.module.codequick" version="0.9.10"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>
@@ -24,7 +24,7 @@
             <screenshot>resources/screenshots/screenshot001.jpg</screenshot>
             <screenshot>resources/screenshots/screenshot002.jpg</screenshot>
         </assets>
-        <news>[fix] Update after site changes.\n [add] Search option.</news>
+        <news>[upd] Only list the youtube channels from now on, as site now uses "sucuri" to block bots. :(</news>
         <reuselanguageinvoker>true</reuselanguageinvoker>
     </extension>
 </addon>
